@@ -26,8 +26,8 @@ public class Nuclear2{
         int addB;
         int addC;
 
-        int MaxVal =0;
-        int MaxT=0;
+        int MaxVal =0; // MaxB Value init
+        int MaxT=0; // Max Time Value init
 
 
         double probAB; // this is the chance of decay process happening for an atom A to B each iteration
@@ -61,7 +61,7 @@ public class Nuclear2{
             newA = 0; newB = 0; newC = 0;  addB=0; addC=0;
             steps++;
 
-            for(int i=0; i<A; i++){
+            for(int i=0; i<A; i++){//If for cheking highest Value
                 if( no_decay( probAB) ){
                     newA++;
                 }
