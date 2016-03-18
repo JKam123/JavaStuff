@@ -1,5 +1,3 @@
-import javafx.scene.paint.Stop;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -17,7 +15,7 @@ public class Particle {
     static final boolean[] RunSimulation = {false};
     final static double K = 9 * power(10,9);
     final static double E = 1.6 * power(10,-19);
-
+    public static JFrame main = new JFrame("Particle Simulation");
     public static JLabel RoundsRun;
     public static JLabel Status;
     public static JLabel LabelEnergy;
@@ -55,7 +53,7 @@ public class Particle {
         print(String.valueOf(pens));
 
 
-        int Size = 100;
+        int Size = 20;
         int Area = 500;
         Particle[] ParticleArray = new Particle[Size];
         for(int i=0;i <Size;i++){
@@ -74,7 +72,7 @@ public class Particle {
 
     public static void drawPositions(Particle[] P){
 
-        JFrame main = new JFrame("Particle Simulation");
+
         main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 
@@ -211,6 +209,65 @@ public class Particle {
         }
     }
 
+    public double pEnergy(Particle b){
+        double distance = Math.pow( (this.x-b.x)*(this.x-b.x)+(this.y-b.y)*(this.y-b.y) ,0.5);
+        return K*this.charge*b.charge/distance;}
+
+    public static double partialPEnergy(int k, Particle[] parts){
+        double sum=0;
+        for(int i=0;i<parts.length;i++){
+            if(i!=k){sum=sum+parts[i].pEnergy(parts[k]);}}
+        return sum;}
+
+    public static double[] grad(int k, Particle[] parts, double delta){
+        double temp_x = parts[k].x;
+        double temp_y = parts[k].y;
+
+        parts[k].setPosition(temp_x,temp_y+delta,0);
+        double parE_u=partialPEnergy(k,parts);
+        parts[k].setPosition(temp_x,temp_y-delta,0);
+        double parE_d=partialPEnergy(k,parts);
+        parts[k].setPosition(temp_x,temp_y-delta,0);
+        double parE_l=partialPEnergy(k,parts);
+        parts[k].setPosition(temp_x+delta,temp_y,0);
+        double parE_r=partialPEnergy(k,parts);
+
+        parts[k].setPosition(temp_x,temp_y,0);
+        double grad_x=(parE_r-parE_l)/(2*delta);
+        double grad_y=(parE_u-parE_d)/(2*delta);
+
+        double[] output = new double[2];
+        output[0]=grad_x;
+        output[1]=grad_y;
+
+        return output;
+
+    }
+
+    public static void moveToSmallest(Particle P){
+        double SmallestE = totalPe(ParticleDrawer.AllStuff);
+        int[] BeginningCoord = new int[]{(int)P.x,(int)P.y};
+        int[] SmallestCoord = new int[]{0,0};
+        for(int i = -1; i< 2;i++){
+            for(int x = -1; x< 2;x++){
+                if(!(Math.sqrt((ParticleDrawer.Center - P.x)*(ParticleDrawer.Center - P.x)+(ParticleDrawer.Center - P.y)*(ParticleDrawer.Center - P.y)) > 497)){
+                    P.x = BeginningCoord[0] + i;
+                    P.y = BeginningCoord[1] +x ;
+                    if(totalPe(ParticleDrawer.AllStuff) < SmallestE){
+                        SmallestE = totalPe(ParticleDrawer.AllStuff);
+                        SmallestCoord = new int[]{i,x};
+                        ParticleDrawer.HasUpdated = true;
+                    }
+                }
+
+            }
+        }
+        P.x = BeginningCoord[0]+SmallestCoord[0];
+        P.y = BeginningCoord[1]+SmallestCoord[1];
+
+
+    }
+
     public static void moveRight(Particle P){
         P.x = P.x +1;
         if(!P.isInCircle()) {
@@ -238,6 +295,41 @@ public class Particle {
         }
     }
 
+    public static void moveDiagUpRight(Particle P){
+        P.x = P.x +1;
+        P.y = P.y -1;
+        if(!P.isInCircle()) {
+            P.x = P.x -1;
+            P.y = P.y +1;
+        }
+    }
+
+    public static void moveDiagDownRight(Particle P){
+        P.x = P.x +1;
+        P.y = P.y +1;
+        if(!P.isInCircle()) {
+            P.x = P.x -1;
+            P.y = P.y -1;
+        }
+    }
+
+    public static void moveDiagUpLeft(Particle P){
+        P.x = P.x -1;
+        P.y = P.y -1;
+        if(!P.isInCircle()) {
+            P.x = P.x +1;
+            P.y = P.y +1;
+        }
+    }
+
+    public static void moveDiagDownLeft(Particle P){
+        P.x = P.x -1;
+        P.y = P.y +1;
+        if(!P.isInCircle()) {
+            P.x = P.x +1;
+            P.y = P.y -1;
+        }
+    }
 
     public static double totalPe(Particle[] particles){
         double Final = 0.0;

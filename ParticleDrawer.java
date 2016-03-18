@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -10,6 +11,7 @@ class ParticleDrawer extends JComponent {
     public static long refrTime = 50;
     public static int Center = 497;
     public static int Runed = 0;
+    public static boolean HasUpdated = false;
     public void paint(Graphics g) {
         g.fillRect(1, 1, 992,992);
         g.setColor(Color.WHITE);
@@ -23,7 +25,12 @@ class ParticleDrawer extends JComponent {
             Runed++;
             double TEnergy = Particle.totalPe(AllStuff);
             Particle.LabelEnergy.setText("The total energy is: "+TEnergy);
+            ParticleDrawer.HasUpdated = false;
             for (int i = 0; i < AllStuff.length; i++) {
+                Particle.moveToSmallest(AllStuff[i]);
+
+               /** boolean PosChanged1 = true;
+                boolean PosChanged2 = true;
                 Particle.moveLeft(AllStuff[i]);
                 if (Particle.totalPe(AllStuff) < TEnergy) {
                     TEnergy = Particle.totalPe(AllStuff);
@@ -36,6 +43,7 @@ class ParticleDrawer extends JComponent {
                         //System.out.println("Smaller LEFT");
                     } else {
                         Particle.moveLeft(AllStuff[i]);
+                        PosChanged1 = false;
                         //System.out.println("NO left/right");
                     }
                 }
@@ -52,12 +60,53 @@ class ParticleDrawer extends JComponent {
                     } else {
                         Particle.moveUp(AllStuff[i]);
                         //System.out.println("NO up/down");
+                        PosChanged2 = false;
                     }
                 }
+                if(!(PosChanged1) & !(PosChanged2)){
+                    Particle.moveDiagUpRight(AllStuff[i]);
+                    if (Particle.totalPe(AllStuff) < TEnergy) {
+                        TEnergy = Particle.totalPe(AllStuff);
+                        //System.out.println("Smaller UP");
+                    } else {
+                        Particle.moveDiagDownLeft(AllStuff[i]);
+                    }
+                    Particle.moveDiagUpLeft(AllStuff[i]);
+                    if (Particle.totalPe(AllStuff) < TEnergy) {
+                        TEnergy = Particle.totalPe(AllStuff);
+                        //System.out.println("Smaller UP");
+                    } else {
+                        Particle.moveDiagDownRight(AllStuff[i]);
+                    }
+                    Particle.moveDiagDownRight(AllStuff[i]);
+                    if (Particle.totalPe(AllStuff) < TEnergy) {
+                        TEnergy = Particle.totalPe(AllStuff);
+                        //System.out.println("Smaller UP");
+                    } else {
+                        Particle.moveDiagUpLeft(AllStuff[i]);
+                    }
+                    Particle.moveDiagDownLeft(AllStuff[i]);
+                    if (Particle.totalPe(AllStuff) < TEnergy) {
+                        TEnergy = Particle.totalPe(AllStuff);
+                        //System.out.println("Smaller UP");
+                    } else {
+                        Particle.moveDiagUpRight(AllStuff[i]);
+                    }
+                }
+                */
 
+                //double[] LOL = Particle.grad(i, AllStuff, 1);
+                //AllStuff[i].setPosition(LOL[0],LOL[1],0);
             }
-
+            if(!HasUpdated){
+                Update = false;
+                JOptionPane.showMessageDialog(Particle.main,
+                        "The Simulation has finished",
+                        "Simulation Done",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
         }
+
         for (int i = 0; i < AllStuff.length; i++) {
             g.fillOval(-15+(int) AllStuff[i].x, -15+(int) AllStuff[i].y, 30, 30);
         }
